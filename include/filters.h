@@ -9,5 +9,5 @@ char lower_filter(char);
 
 char null_filter(char);
 
-filter_func selectFilter(const char *filterString);
+filter_func selectFilter(char filterChar);
 #endif

@@ -31,17 +31,17 @@ char null_filter(char c)
     return c;
 }
 
-filter_func selectFilter(const char *filterString)
+filter_func selectFilter(const char filterChar)
 {
-    if(strcasecmp(filterString, "upper") == 0)
+    if(filterChar == 'u' || filterChar == 'U')
     {
         return upper_filter;
     }
-    if(strcasecmp(filterString, "lower") == 0)
+    if(filterChar == 'l' || filterChar == 'L')
     {
         return lower_filter;
     }
-    if(strcasecmp(filterString, "null") == 0)
+    if(filterChar == 'n' || filterChar == 'N')
     {
         return null_filter;
     }
