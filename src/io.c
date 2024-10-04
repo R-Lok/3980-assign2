@@ -1,8 +1,9 @@
+#include "io.h"
 #include "filters.h"
+#include <errno.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
-#include <errno.h>
 
 int processText(int inputFd, int outputFd, char filterChar, int *err)
 {
@@ -13,7 +14,7 @@ int processText(int inputFd, int outputFd, char filterChar, int *err)
 
     filter = selectFilter(filterChar);
 
-    while(read(inputFd, &buffer, 1) != 0)
+    while((readRes = read(inputFd, &buffer, 1)) != 0)
     {
         ssize_t writeRes;
         if(readRes == -1)
@@ -22,7 +23,7 @@ int processText(int inputFd, int outputFd, char filterChar, int *err)
             perror("Read error");
             return (EXIT_FAILURE);
         }
-        transformedChar = func(buffer);
+        transformedChar = filter(buffer);
         writeRes        = write(outputFd, &transformedChar, 1);
         if(writeRes == -1)
         {
