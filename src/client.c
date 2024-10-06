@@ -12,6 +12,8 @@ int  selectFilterChar(const char *str);
 int  checkValidArgs(const char *str, char filterChar);
 void printArgsFormat(void);
 
+int constructMsg(char filterChar, const char **str, char **msg);
+
 int main(int argc, char **argv)
 {
     int         opt;
@@ -20,6 +22,7 @@ int main(int argc, char **argv)
     int         reqFd;
     int         resFd;
     int         ret = EXIT_SUCCESS;
+    char       *message;
 
     while((opt = getopt(argc, argv, ":i:f:")) != -1)
     {
@@ -48,7 +51,7 @@ int main(int argc, char **argv)
         exit(EXIT_FAILURE);
     }
 
-    printf("%s, %c", str, filterChar);
+    printf("%s, %c\n", str, filterChar);
 
     reqFd = open(reqFifo, O_WRONLY | O_CLOEXEC);
     if(reqFd == -1)
@@ -66,6 +69,14 @@ int main(int argc, char **argv)
         goto fail_openres;
     }
 
+    if((constructMsg(filterChar, &str, &message)) == 1)
+    {
+        goto cleanup;
+    }
+
+    free(message);
+
+cleanup:
     close(resFd);
 fail_openres:
     close(reqFd);
@@ -101,5 +112,22 @@ int checkValidArgs(const char *str, char filterChar)
     {
         return 1;
     }
+    return 0;
+}
+
+int constructMsg(char filterChar, const char **str, char **msg)
+{
+    char  *tempmsg;
+    size_t strlength = strlen(*(str));
+    printf("%zu", strlength);
+
+    tempmsg = (char *)malloc(strlength + 2);
+    if(tempmsg == NULL)
+    {
+        return 1;
+    }
+    *tempmsg = filterChar;
+    strlcpy(tempmsg + 1, *(str), strlength + 1); //strlength + 1 to account for NUL terminator.
+    *msg = tempmsg;
     return 0;
 }
