@@ -5,6 +5,7 @@
 #include <unistd.h>
 
 int  selectFilterChar(const char *str);
+int  checkValidArgs(const char *str, char filterChar);
 void printArgsFormat(void);
 
 int main(int argc, char **argv)
@@ -18,7 +19,6 @@ int main(int argc, char **argv)
         switch(opt)
         {
             case 'i':
-                printf("Input string: %s", optarg);
                 str = optarg;
                 break;
             case 'f':
@@ -33,11 +33,20 @@ int main(int argc, char **argv)
                 printf("Useless flag entered: %c, proceeding..", optopt);
         }
     }
+    if(checkValidArgs(str, filterChar))
+    {
+        errno = EINVAL;
+        perror("Invalid arguments");
+        printArgsFormat();
+        exit(EXIT_FAILURE);
+    }
+
+    printf("%s, %c", str, filterChar);
 }
 
 void printArgsFormat(void)
 {
-    printf("To run: ./build/client -i \"<Text>\" -f <upper/lower/null>");
+    printf("To run: ./build/client -i \"<text to transform>\" -f <upper/lower/null>");
 }
 
 int selectFilterChar(const char *str)
@@ -55,4 +64,13 @@ int selectFilterChar(const char *str)
         return 'n';
     }
     return 0;    // charcode for NUL
+}
+
+int checkValidArgs(const char *str, char filterChar)
+{
+    if(!str || filterChar == '\0')
+    {
+        return 1;
+    }
+    return 0;
 }
