@@ -11,8 +11,9 @@
 int  selectFilterChar(const char *str);
 int  checkValidArgs(const char *str, char filterChar);
 void printArgsFormat(void);
-
-int constructMsg(char filterChar, const char **str, char **msg);
+int  constructMsg(char filterChar, const char **str, char **msg);
+int  writeReq(int reqFd, const char *msg);
+// int  processResponse(int resFd, size_t strlength);
 
 int main(int argc, char **argv)
 {
@@ -71,12 +72,19 @@ int main(int argc, char **argv)
 
     if((constructMsg(filterChar, &str, &message)) == 1)
     {
+        goto fail_malloc;
+    }
+
+    if(writeReq(reqFd, message))
+    {
         goto cleanup;
     }
 
-    free(message);
+    // processResponse(resFd, strlen(str));
 
 cleanup:
+    free(message);
+fail_malloc:
     close(resFd);
 fail_openres:
     close(reqFd);
@@ -119,7 +127,6 @@ int constructMsg(char filterChar, const char **str, char **msg)
 {
     char  *tempmsg;
     size_t strlength = strlen(*(str));
-    printf("%zu", strlength);
 
     tempmsg = (char *)malloc(strlength + 2);
     if(tempmsg == NULL)
@@ -127,7 +134,39 @@ int constructMsg(char filterChar, const char **str, char **msg)
         return 1;
     }
     *tempmsg = filterChar;
-    strlcpy(tempmsg + 1, *(str), strlength + 1); //strlength + 1 to account for NUL terminator.
+    strlcpy(tempmsg + 1, *(str), strlength + 1);    // strlength + 1 to account for NUL terminator.
     *msg = tempmsg;
+    printf("%s\n", tempmsg);
     return 0;
 }
+
+int writeReq(int reqFd, const char *msg)
+{
+    if(write(reqFd, msg, strlen(msg)) == -1)
+    {
+        perror("Error writing to request fifo");
+        return 1;
+    }
+    return 0;
+}
+
+// int processResponse(int resFd, size_t strlength)
+// {
+//     char *buf = (char *)malloc(strlength + 1);
+//     if(buf == NULL)
+//     {
+//         perror("malloc failed \n");
+//         return 1;
+//     }
+//     if(read(resFd, buf, strlength) == -1)
+//     {
+//         perror("read failed\n");
+//         free(buf);
+//         return 1;
+//     }
+//     buf[strlength] = '\0';
+
+//     printf("Response: %s", buf);
+//     free(buf);
+//     return 0;
+// }

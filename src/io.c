@@ -20,7 +20,7 @@ int processText(int inputFd, int outputFd, char filterChar, int *err)
         if(readRes == -1)
         {
             *err = errno;
-            perror("Read error");
+            perror("Read error\n");
             return (EXIT_FAILURE);
         }
         transformedChar = filter(buffer);
@@ -28,7 +28,7 @@ int processText(int inputFd, int outputFd, char filterChar, int *err)
         if(writeRes == -1)
         {
             *err = errno;
-            perror("Write error");
+            perror("Write error\n");
             return (EXIT_FAILURE);
         }
     }

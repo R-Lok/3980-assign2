@@ -14,12 +14,12 @@ int main(void)
     int ret;
     int reqFd;
     int resFd;
-    printf("Starting server...");
+    printf("Starting server...\n");
 
     reqFd = open(reqFifo, O_RDONLY | O_CLOEXEC);
     if(reqFd == -1)
     {
-        perror("open reqFifo");
+        perror("open reqFifo\n");
         ret = EXIT_FAILURE;
         goto fail_req;
     }
@@ -27,7 +27,7 @@ int main(void)
     resFd = open(resFifo, O_WRONLY | O_CLOEXEC);
     if(resFd == -1)
     {
-        perror("open resFifo");
+        perror("open resFifo\n");
         ret = EXIT_FAILURE;
         goto fail_res;
     }
@@ -40,7 +40,7 @@ int main(void)
         ssize_t readRes = read(reqFd, &filterChar, 1);
         if(readRes == -1)
         {
-            perror("read reqFifo");
+            perror("read reqFifo\n");
             ret = EXIT_FAILURE;
             goto cleanup;
         }
@@ -50,7 +50,7 @@ int main(void)
         {
             errno = err;
             ret   = EXIT_FAILURE;
-            perror("read/write error in processText");
+            perror("read/write error in processText\n");
             goto cleanup;
         }
 
