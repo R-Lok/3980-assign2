@@ -11,9 +11,10 @@
 
 int main(void)
 {
-    int ret;
-    int reqFd;
     int resFd;
+    int reqFd;
+    int ret = EXIT_SUCCESS;
+
     printf("Starting server...\n");
 
     reqFd = open(reqFifo, O_RDONLY | O_CLOEXEC);
@@ -37,7 +38,9 @@ int main(void)
     {
         char    filterChar;
         int     err;
-        ssize_t readRes = read(reqFd, &filterChar, 1);
+        ssize_t readRes;
+
+        readRes = read(reqFd, &filterChar, 1);
         if(readRes == -1)
         {
             perror("read reqFifo\n");
