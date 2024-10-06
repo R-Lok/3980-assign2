@@ -4,16 +4,16 @@
 #include <string.h>
 #include <unistd.h>
 
-int  selectFilterChar(char *str);
-void printArgsFormat();
+int  selectFilterChar(const char *str);
+void printArgsFormat(void);
 
 int main(int argc, char **argv)
 {
-    int   opt;
-    char *str = NULL;
-    char  filterChar;
+    int         opt;
+    const char *str        = NULL;
+    char        filterChar = '\0';
 
-    while((opt = getopt(argc, argv, ":i:f:")))
+    while((opt = getopt(argc, argv, ":i:f:")) != -1)
     {
         switch(opt)
         {
@@ -35,12 +35,12 @@ int main(int argc, char **argv)
     }
 }
 
-void printArgsFormat()
+void printArgsFormat(void)
 {
     printf("To run: ./build/client -i \"<Text>\" -f <upper/lower/null>");
 }
 
-int selectFilterChar(char *str)
+int selectFilterChar(const char *str)
 {
     if(strcasecmp(str, "upper") == 0)
     {
