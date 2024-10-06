@@ -14,6 +14,7 @@ int main(void)
     int ret;
     int reqFd;
     int resFd;
+    printf("Starting server...");
 
     reqFd = open(reqFifo, O_RDONLY | O_CLOEXEC);
     if(reqFd == -1)
@@ -30,12 +31,12 @@ int main(void)
         ret = EXIT_FAILURE;
         goto fail_res;
     }
+    printf("opened res\n");
 
     while(true)
     {
-        char filterChar;
-        int  err;
-
+        char    filterChar;
+        int     err;
         ssize_t readRes = read(reqFd, &filterChar, 1);
         if(readRes == -1)
         {
@@ -43,6 +44,7 @@ int main(void)
             ret = EXIT_FAILURE;
             goto cleanup;
         }
+        printf("After read\n");
 
         if(processText(reqFd, resFd, filterChar, &err))
         {
@@ -51,6 +53,8 @@ int main(void)
             perror("read/write error in processText");
             goto cleanup;
         }
+
+        printf("after process text\n");
     }
     ret = EXIT_SUCCESS;
 cleanup:
