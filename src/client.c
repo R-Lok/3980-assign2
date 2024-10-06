@@ -1,8 +1,12 @@
 #include <errno.h>
+#include <fcntl.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <unistd.h>
+
+#define reqFifo "/tmp/request"
+#define resFifo "/tmp/response"
 
 int  selectFilterChar(const char *str);
 int  checkValidArgs(const char *str, char filterChar);
@@ -13,6 +17,9 @@ int main(int argc, char **argv)
     int         opt;
     const char *str        = NULL;
     char        filterChar = '\0';
+    int         reqFd;
+    int         resFd;
+    int         ret = EXIT_SUCCESS;
 
     while((opt = getopt(argc, argv, ":i:f:")) != -1)
     {
@@ -42,6 +49,28 @@ int main(int argc, char **argv)
     }
 
     printf("%s, %c", str, filterChar);
+
+    reqFd = open(reqFifo, O_WRONLY | O_CLOEXEC);
+    if(reqFd == -1)
+    {
+        perror("Filed to open request fifo");
+        ret = EXIT_FAILURE;
+        goto done;
+    }
+
+    resFd = open(resFifo, O_RDONLY | O_CLOEXEC);
+    if(resFd == -1)
+    {
+        perror("Failed to open response fifo");
+        ret = EXIT_FAILURE;
+        goto fail_openres;
+    }
+
+    close(resFd);
+fail_openres:
+    close(reqFd);
+done:
+    return ret;
 }
 
 void printArgsFormat(void)
