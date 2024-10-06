@@ -1,6 +1,7 @@
 #include "../include/io.h"
 #include <errno.h>
 #include <fcntl.h>
+#include <pthread.h>
 #include <stdbool.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -36,9 +37,12 @@ int main(void)
 
     while(true)
     {
-        char    filterChar;
-        int     err;
-        ssize_t readRes;
+        char        filterChar;
+        int         err;
+        int         threadRes;
+        pthread_t   thread;
+        TextHandler details;
+        ssize_t     readRes;
 
         readRes = read(reqFd, &filterChar, 1);
         if(readRes == -1)
@@ -49,11 +53,30 @@ int main(void)
         }
         printf("After read\n");
 
-        if(processText(reqFd, resFd, filterChar, &err))
+        details.inputFd    = reqFd;
+        details.outputFd   = resFd;
+        details.filterChar = filterChar;
+        details.err        = &err;
+
+        threadRes = pthread_create(&thread, NULL, processText, &details);
+        if(threadRes == -1)
         {
-            errno = err;
-            ret   = EXIT_FAILURE;
-            perror("read/write error in processText\n");
+            perror("Failed to create thread");
+            ret = EXIT_FAILURE;
+            goto cleanup;
+        }
+
+        threadRes = pthread_join(thread, NULL);
+        if(threadRes == -1)
+        {
+            perror("Failed to create thread");
+            ret = EXIT_FAILURE;
+            goto cleanup;
+        }
+
+        if(details.threadExitVal)
+        {
+            ret = EXIT_FAILURE;
             goto cleanup;
         }
 

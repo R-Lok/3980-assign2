@@ -5,32 +5,38 @@
 #include <stdlib.h>
 #include <unistd.h>
 
-int processText(int inputFd, int outputFd, char filterChar, int *err)
+void *processText(void *textDetails)
 {
-    char        buffer;    // Processing one char at the same time
-    char        transformedChar;
-    ssize_t     readRes;
-    filter_func filter;
+    TextHandler *td;
+    char         buffer;    // Processing one char at the same time
+    char         transformedChar;
+    ssize_t      readRes;
+    filter_func  filter;
 
-    filter = selectFilter(filterChar);
+    td                = (TextHandler *)textDetails;
+    td->threadExitVal = 0;
 
-    while((readRes = read(inputFd, &buffer, 1)) != 0)
+    filter = selectFilter(td->filterChar);
+
+    while((readRes = read(td->inputFd, &buffer, 1)) != 0)
     {
         ssize_t writeRes;
         if(readRes == -1)
         {
-            *err = errno;
+            *(td->err) = errno;
             perror("Read error\n");
-            return (EXIT_FAILURE);
+            td->threadExitVal = 1;
+            return NULL;
         }
         transformedChar = filter(buffer);
-        writeRes        = write(outputFd, &transformedChar, 1);
+        writeRes        = write(td->outputFd, &transformedChar, 1);
         if(writeRes == -1)
         {
-            *err = errno;
+            *(td->err) = errno;
             perror("Write error\n");
-            return (EXIT_FAILURE);
+            td->threadExitVal = 1;
+            return NULL;
         }
     }
-    return EXIT_SUCCESS;
+    return NULL;
 }
