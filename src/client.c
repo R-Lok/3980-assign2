@@ -13,7 +13,8 @@ int  checkValidArgs(const char *str, char filterChar);
 void printArgsFormat(void);
 int  constructMsg(char filterChar, const char **str, char **msg);
 int  writeReq(int reqFd, const char *msg);
-// int  processResponse(int resFd, size_t strlength);
+
+int processResponse(int resFd, size_t strlength);
 
 int main(int argc, char **argv)
 {
@@ -80,7 +81,7 @@ int main(int argc, char **argv)
         goto cleanup;
     }
 
-    // processResponse(resFd, strlen(str));
+    processResponse(resFd, strlen(str));
 
 cleanup:
     free(message);
@@ -150,23 +151,31 @@ int writeReq(int reqFd, const char *msg)
     return 0;
 }
 
-// int processResponse(int resFd, size_t strlength)
-// {
-//     char *buf = (char *)malloc(strlength + 1);
-//     if(buf == NULL)
-//     {
-//         perror("malloc failed \n");
-//         return 1;
-//     }
-//     if(read(resFd, buf, strlength) == -1)
-//     {
-//         perror("read failed\n");
-//         free(buf);
-//         return 1;
-//     }
-//     buf[strlength] = '\0';
+int processResponse(int resFd, size_t strlength)
+{
+    ssize_t nread = 0;
+    char   *buf   = (char *)malloc(strlength + 1);
+    if(buf == NULL)
+    {
+        perror("malloc failed \n");
+        return 1;
+    }
 
-//     printf("Response: %s", buf);
-//     free(buf);
-//     return 0;
-// }
+    do
+    {
+        ssize_t tread;
+        tread = read(resFd, buf + nread, (strlength - (size_t)nread));
+        if(tread == -1)
+        {
+            perror("read failed\n");
+            free(buf);
+            return 1;
+        }
+        nread += tread;
+    } while(nread != (ssize_t)strlength);
+    buf[strlength] = '\0';
+
+    printf("Response: %s", buf);
+    free(buf);
+    return 0;
+}
