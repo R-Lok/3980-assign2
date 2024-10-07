@@ -2,6 +2,7 @@
 #include <errno.h>
 #include <fcntl.h>
 #include <pthread.h>
+#include <signal.h>
 #include <stdbool.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -10,6 +11,14 @@
 #define reqFifo "/tmp/request"
 #define resFifo "/tmp/response"
 
+// NOLINTNEXTLINE(cppcoreguidelines-avoid-non-const-global-variables)
+static volatile sig_atomic_t signal_flag = 0;    // This non-const global is needed if graceful shutdown involves closing file descriptors,
+                                                 // since signal handler functions can only take the signal number, there is no way to pass
+                                                 // the file descriptors for closing in the handler logic. So, need to make use of a global flag to know to
+                                                 // goto cleanup logic.
+
+void handle_signal(int signal);
+
 int main(void)
 {
     int resFd;
@@ -17,6 +26,7 @@ int main(void)
     int ret = EXIT_SUCCESS;
 
     printf("Starting server...\n");
+    signal(SIGINT, handle_signal);
 
     reqFd = open(reqFifo, O_RDONLY | O_CLOEXEC);
     if(reqFd == -1)
@@ -42,6 +52,12 @@ int main(void)
         pthread_t   thread;
         TextHandler details;
         ssize_t     readRes;
+
+        if(signal_flag == SIGINT)
+        {
+            printf("SIGINT signal received, gracefully terminating..\n");
+            goto cleanup;
+        }
 
         readRes = read(reqFd, &filterChar, 1);
         if(readRes == -1)
@@ -88,4 +104,9 @@ fail_res:
     close(reqFd);
 fail_req:
     return ret;
+}
+
+void handle_signal(int signal)
+{
+    signal_flag = signal;
 }
