@@ -41,7 +41,9 @@ int main(int argc, char **argv)
                 printArgsFormat();
                 exit(EXIT_FAILURE);
             default:
-                printf("Useless flag entered: %c, proceeding..\n", optopt);
+                printf("Unrecognized flag entered: %c, terminating.\n", optopt);
+                printArgsFormat();
+                exit(EXIT_FAILURE);
         }
     }
     if(checkValidArgs(str, filterChar))
