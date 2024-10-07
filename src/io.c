@@ -38,5 +38,7 @@ void *processText(void *textDetails)
             return NULL;
         }
     }
+    printf("Done sending response.\n");
+    fflush(stdout);
     return NULL;
 }

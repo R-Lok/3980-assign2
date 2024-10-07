@@ -33,7 +33,6 @@ int main(void)
         ret = EXIT_FAILURE;
         goto fail_res;
     }
-    printf("opened res\n");
 
     while(true)
     {
@@ -51,36 +50,36 @@ int main(void)
             ret = EXIT_FAILURE;
             goto cleanup;
         }
-        printf("After read\n");
 
-        details.inputFd    = reqFd;
-        details.outputFd   = resFd;
-        details.filterChar = filterChar;
-        details.err        = &err;
-
-        threadRes = pthread_create(&thread, NULL, processText, &details);
-        if(threadRes == -1)
+        if(readRes != 0)
         {
-            perror("Failed to create thread");
-            ret = EXIT_FAILURE;
-            goto cleanup;
-        }
+            details.inputFd    = reqFd;
+            details.outputFd   = resFd;
+            details.filterChar = filterChar;
+            details.err        = &err;
 
-        threadRes = pthread_join(thread, NULL);
-        if(threadRes == -1)
-        {
-            perror("Failed to create thread");
-            ret = EXIT_FAILURE;
-            goto cleanup;
-        }
+            threadRes = pthread_create(&thread, NULL, processText, &details);
+            if(threadRes == -1)
+            {
+                perror("Failed to create thread");
+                ret = EXIT_FAILURE;
+                goto cleanup;
+            }
 
-        if(details.threadExitVal)
-        {
-            ret = EXIT_FAILURE;
-            goto cleanup;
-        }
+            threadRes = pthread_join(thread, NULL);
+            if(threadRes == -1)
+            {
+                perror("Failed to join thread");
+                ret = EXIT_FAILURE;
+                goto cleanup;
+            }
 
-        printf("after process text\n");
+            if(details.threadExitVal)
+            {
+                ret = EXIT_FAILURE;
+                goto cleanup;
+            }
+        }
     }
     ret = EXIT_SUCCESS;
 cleanup:
