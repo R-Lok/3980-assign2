@@ -37,11 +37,11 @@ int main(int argc, char **argv)
                 break;
             case ':':
                 errno = EINVAL;
-                perror("Required argument for flag option is missing");
+                perror("Required argument for flag option is missing\n");
                 printArgsFormat();
                 exit(EXIT_FAILURE);
             default:
-                printf("Useless flag entered: %c, proceeding..", optopt);
+                printf("Useless flag entered: %c, proceeding..\n", optopt);
         }
     }
     if(checkValidArgs(str, filterChar))
@@ -57,7 +57,7 @@ int main(int argc, char **argv)
     reqFd = open(reqFifo, O_WRONLY | O_CLOEXEC);
     if(reqFd == -1)
     {
-        perror("Filed to open request fifo");
+        perror("Filed to open request fifo\n");
         ret = EXIT_FAILURE;
         goto done;
     }
@@ -65,7 +65,7 @@ int main(int argc, char **argv)
     resFd = open(resFifo, O_RDONLY | O_CLOEXEC);
     if(resFd == -1)
     {
-        perror("Failed to open response fifo");
+        perror("Failed to open response fifo\n");
         ret = EXIT_FAILURE;
         goto fail_openres;
     }
@@ -94,7 +94,7 @@ done:
 
 void printArgsFormat(void)
 {
-    printf("To run: ./build/client -i \"<text to transform>\" -f <upper/lower/null>");
+    printf("To run: ./build/client -i \"<text to transform>\" -f <upper/lower/null>\n");
 }
 
 int selectFilterChar(const char *str)
@@ -144,7 +144,7 @@ int writeReq(int reqFd, const char *msg)
 {
     if(write(reqFd, msg, strlen(msg)) == -1)
     {
-        perror("Error writing to request fifo");
+        perror("Error writing to request fifo\n");
         return 1;
     }
     return 0;
@@ -174,7 +174,7 @@ int processResponse(int resFd, size_t strlength)
     } while(nread != (ssize_t)strlength);
     buf[strlength] = '\0';
 
-    printf("Response: %s", buf);
+    printf("Response: %s\n", buf);
     free(buf);
     return 0;
 }
