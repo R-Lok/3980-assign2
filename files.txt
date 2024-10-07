@@ -1,2 +1,2 @@
 server src/server.c src/filters.c src/io.c include/filters.h include/io.h
-client src/client.c
+client src/client.c src/args.c include/args.h src/clientio.c include/clientio.h
