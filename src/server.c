@@ -31,6 +31,11 @@ int main(void)
     reqFd = open(reqFifo, O_RDONLY | O_CLOEXEC);
     if(reqFd == -1)
     {
+        if(errno == EINTR)
+        {
+            printf("SIGINT signal received, gracefully terminating..\n");
+            exit(EXIT_SUCCESS);
+        }
         perror("open reqFifo\n");
         ret = EXIT_FAILURE;
         goto fail_req;

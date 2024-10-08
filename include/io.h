@@ -1,6 +1,5 @@
 #ifndef IO_H
 #define IO_H
-#include <stdlib.h>
 
 // cppcheck thinks I am not using these members at all, when I infact am, in the implementation of processText in io.c
 typedef struct TextHandler
