@@ -36,7 +36,7 @@ int main(void)
             printf("SIGINT signal received, gracefully terminating..\n");
             exit(EXIT_SUCCESS);
         }
-        perror("open reqFifo\n");
+        perror("error on open reqFifo\n");
         ret = EXIT_FAILURE;
         goto fail_req;
     }
@@ -44,7 +44,7 @@ int main(void)
     resFd = open(resFifo, O_WRONLY | O_CLOEXEC);
     if(resFd == -1)
     {
-        perror("open resFifo\n");
+        perror("error on open resFifo\n");
         ret = EXIT_FAILURE;
         goto fail_res;
     }
@@ -104,9 +104,15 @@ int main(void)
     }
     ret = EXIT_SUCCESS;
 cleanup:
-    close(resFd);
+    if(close(resFd) == -1)
+    {
+        perror("error closing response fifo");
+    }
 fail_res:
-    close(reqFd);
+    if(close(reqFd) == -1)
+    {
+        perror("error closing request fifo");
+    }
 fail_req:
     return ret;
 }
