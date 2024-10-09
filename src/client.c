@@ -49,8 +49,6 @@ int main(int argc, char **argv)
         exit(EXIT_FAILURE);
     }
 
-    printf("%s, %c\n", str, filterChar);
-
     reqFd = open(reqFifo, O_WRONLY | O_CLOEXEC);
     if(reqFd == -1)
     {
