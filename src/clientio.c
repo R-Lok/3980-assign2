@@ -22,11 +22,19 @@ int constructMsg(char filterChar, const char **str, char **msg)
 
 int writeReq(int reqFd, const char *msg)
 {
-    if(write(reqFd, msg, strlen(msg)) == -1)
+    size_t msgLength = strlen(msg);
+    size_t nwrote    = 0;
+    do
     {
-        perror("Error writing to request fifo\n");
-        return 1;
-    }
+        ssize_t twrote = write(reqFd, msg + nwrote, strlen(msg) - nwrote);
+        if(twrote == -1)
+        {
+            perror("Error writing to request fifo\n");
+            return 1;
+        }
+        nwrote += (size_t)twrote;
+    } while(nwrote != msgLength);
+
     return 0;
 }
 
