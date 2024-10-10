@@ -80,9 +80,17 @@ int main(int argc, char **argv)
 cleanup:
     free(message);
 fail_malloc:
-    close(resFd);
+    if(close(resFd) == -1)
+    {
+        perror("error closing response fifo");
+        ret = EXIT_FAILURE;
+    }
 fail_openres:
-    close(reqFd);
+    if(close(reqFd) == -1)
+    {
+        perror("error closing request fifo");
+        ret = EXIT_FAILURE;
+    }
 done:
     return ret;
 }

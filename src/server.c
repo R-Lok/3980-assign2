@@ -107,11 +107,13 @@ cleanup:
     if(close(resFd) == -1)
     {
         perror("error closing response fifo");
+        ret = EXIT_FAILURE;
     }
 fail_res:
     if(close(reqFd) == -1)
     {
         perror("error closing request fifo");
+        ret = EXIT_FAILURE;
     }
 fail_req:
     return ret;
