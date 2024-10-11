@@ -102,7 +102,6 @@ int main(void)
             }
         }
     }
-    ret = EXIT_SUCCESS;
 cleanup:
     if(close(resFd) == -1)
     {

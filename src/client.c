@@ -75,7 +75,10 @@ int main(int argc, char **argv)
         goto cleanup;
     }
 
-    processResponse(resFd, strlen(str));
+    if(processResponse(resFd, strlen(str)))
+    {
+        ret = EXIT_FAILURE;
+    }
 
 cleanup:
     free(message);
