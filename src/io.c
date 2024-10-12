@@ -1,5 +1,5 @@
-#include "io.h"
-#include "filters.h"
+#include "../include/io.h"
+#include "../include/filters.h"
 #include <errno.h>
 #include <stdio.h>
 #include <stdlib.h>

@@ -1,5 +1,5 @@
-#include "args.h"
-#include "clientio.h"
+#include "../include/args.h"
+#include "../include/clientio.h"
 #include <errno.h>
 #include <fcntl.h>
 #include <stdio.h>

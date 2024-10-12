@@ -80,7 +80,7 @@ int main(void)
             details.err        = &err;
 
             threadRes = pthread_create(&thread, NULL, processText, &details);
-            if(threadRes == -1)
+            if(threadRes != 0)
             {
                 perror("Failed to create thread");
                 ret = EXIT_FAILURE;
@@ -88,7 +88,7 @@ int main(void)
             }
 
             threadRes = pthread_join(thread, NULL);
-            if(threadRes == -1)
+            if(threadRes != 0)
             {
                 perror("Failed to join thread");
                 ret = EXIT_FAILURE;
